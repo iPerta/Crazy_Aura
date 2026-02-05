@@ -24,14 +24,14 @@ const angle = 360 / total
 const radius = 200
 const innerRadius = 90
 
-// Predefined order like Crazy Time - 3 CF, 2 PK, 2 CH, 1 CT, rest values
+// Predefined order like Crazy Time - 4 CF, 2 PK, 2 CH, 1 CT, rest values
 const sliceOrder = [
-  '1', '2', '5', '1', 'Coin Flip', '2', '1', '2', '5', '1',
-  '10', '2', '1', '5', 'Pachinko', '1', '2', '1', '2', '5',
-  '1', '2', 'Cash Hunt', '5', '1', '2', '1', '10', '2', '1',
-  '5', '1', '2', 'Crazy Time', '1', '2', '5', '1', '2', '1',
-  'Pachinko', '5', '10', '2', '1', '2', 'Cash Hunt', '1', '5', '2',
-  '1', '2', '1', 'Coin Flip', '2', '1', '5', '1', 'Coin Flip'
+  '1', '2', '5', '1', '2', 'Coin Flip', '1', '10', '2', '5',
+  '1', '2', 'Pachinko', '1', '5', '2', '1', '2', 'Coin Flip', '5',
+  '10', '1', '2', '5', 'Cash Hunt', '1', '2', '1', '5', '2',
+  '1', '10', '2', 'Crazy Time', '1', '2', '5', '1', '2', 'Coin Flip',
+  '5', '1', '10', '2', '1', 'Pachinko', '2', '5', '1', '2',
+  '1', 'Cash Hunt', '5', 'Coin Flip'
 ]
 
 const slices = sliceOrder.map((label, idx) => {
