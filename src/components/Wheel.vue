@@ -3,35 +3,75 @@
     <div class="wheel-frame">
       <div class="pointer">▼</div>
       <svg class="wheel-svg" :style="wheelStyle" @transitionend="onTransitionEnd" ref="wheelSvg" viewBox="0 0 500 500">
+        <defs>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.5"/>
+          </filter>
+          <linearGradient id="grad-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#DAA520;stop-opacity:1" />
+          </linearGradient>
+           <linearGradient id="grad-red" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FF4500;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
+          </linearGradient>
+        </defs>
         <g>
-          <polygon v-for="(slice, i) in slices" :key="i" :points="slicePoints(i)" :fill="sliceColor(slice)" stroke="none" />
-          <line v-for="(slice, i) in slices" :key="'line-' + i" :x1="250" :y1="250" :x2="radialX(i)" :y2="radialY(i)" stroke="#fff" stroke-width="2" />
-          <text v-for="(slice, i) in slices" :key="'label-' + i" :x="labelX(i)" :y="labelY(i)" class="slice-text" :class="{ 'minigame-text': slice.type === 'minigame' }" paint-order="stroke">{{ slice.type === 'minigame' ? slice.shorterLabel : slice.label }}</text>
+          <!-- Slices -->
+          <path 
+            v-for="(slice, i) in slices" 
+            :key="i" 
+            :d="slicePath(i)" 
+            :fill="sliceColor(slice)" 
+            stroke="rgba(0,0,0,0.2)" 
+            stroke-width="0.5"
+            class="slice-path"
+          />
+          
+          <!-- Text -->
+          <text 
+            v-for="(slice, i) in slices" 
+            :key="'label-' + i" 
+            :x="labelX(i)" 
+            :y="labelY(i)" 
+            :transform="`rotate(${labelRotation(i)}, ${labelX(i)}, ${labelY(i)})`"
+            class="slice-text" 
+            :class="{ 'minigame-text': slice.type === 'minigame' }" 
+            paint-order="stroke"
+          >
+            {{ slice.type === 'minigame' ? slice.shorterLabel : slice.label }}
+          </text>
+
+          <!-- Central Hub (Logo) -->
+          <circle cx="250" cy="250" :r="innerRadius" fill="url(#grad-red)" stroke="url(#grad-gold)" stroke-width="8" />
+          <text x="250" y="240" text-anchor="middle" fill="#FFD700" font-family="serif" font-weight="900" font-size="24" filter="drop-shadow(2px 2px 2px black)">CRAZY</text>
+          <text x="250" y="270" text-anchor="middle" fill="#FFF" font-family="serif" font-weight="900" font-size="24" filter="drop-shadow(2px 2px 2px black)" letter-spacing="2">WHEEL</text>
         </g>
       </svg>
     </div>
-    <button class="btn-spin" @click="spin" :disabled="spinning">{{ spinning ? 'SPINNING...' : 'SPIN' }}</button>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
+const emit = defineEmits(['result'])
+
 const total = 54
 const angle = 360 / total
-const radius = 200
-const innerRadius = 90
+const radius = 245 
+const innerRadius = 60 
 
-// Predefined order like Crazy Time - 4 CF, 2 PK, 2 CH, 1 CT, rest values
+// Exact 54 Slices Sequence
 const sliceOrder = [
-  '1', '2', '5', '1', '2', 'Coin Flip', '1', '10', '2', '5',
-  '1', '2', 'Pachinko', '1', '5', '2', '1', '2', 'Coin Flip', '5',
-  '10', '1', '2', '5', 'Cash Hunt', '1', '2', '1', '5', '2',
-  '1', '10', '2', 'Crazy Time', '1', '2', '5', '1', '2', 'Coin Flip',
-  '5', '1', '10', '2', '1', 'Pachinko', '2', '5', '1', '2',
-  '1', 'Cash Hunt', '5', 'Coin Flip'
+  'Crazy Time', '1', '2', '5', '1', '2', 'Pachinko', '1',
+  '5', '1', '2', '1', 'Coin Flip', '1', '2', '1',
+  '10', '2', 'Cash Hunt', '1', '2', '1', '5',
+  '1', 'Coin Flip', '1', '5', '2', '10',
+  '1', 'Pachinko', '1', '2', '5', '1', '2', 'Coin Flip',
+  '1', '10', '1', '5', '1', 'Cash Hunt', '1',
+  '2', '5', '1', '2', 'Coin Flip', '2', '1', '10',
+  '2', '1'
 ]
 
 const slices = sliceOrder.map((label, idx) => {
@@ -45,63 +85,94 @@ const slices = sliceOrder.map((label, idx) => {
 const wheelSvg = ref(null)
 const spinning = ref(false)
 const currentRotation = ref(0)
+defineExpose({ spin })
 
 const wheelStyle = computed(() => ({
   transform: `rotate(${currentRotation.value}deg)`,
-  transition: spinning.value ? 'transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
+  transition: spinning.value ? 'transform 5s cubic-bezier(0.15, 0.9, 0.3, 1)' : 'none' 
 }))
 
-function slicePoints(i) {
+function slicePath(i) {
   const start = (i * angle - 90) * (Math.PI / 180)
   const end = ((i + 1) * angle - 90) * (Math.PI / 180)
+  
   const x1 = 250 + innerRadius * Math.cos(start)
   const y1 = 250 + innerRadius * Math.sin(start)
+  
   const x2 = 250 + radius * Math.cos(start)
   const y2 = 250 + radius * Math.sin(start)
+  
   const x3 = 250 + radius * Math.cos(end)
   const y3 = 250 + radius * Math.sin(end)
+  
   const x4 = 250 + innerRadius * Math.cos(end)
   const y4 = 250 + innerRadius * Math.sin(end)
+  
   const large = angle > 180 ? 1 : 0
-  return `${x1},${y1} ${x2},${y2} A ${radius} ${radius} 0 ${large} 1 ${x3},${y3} ${x4},${y4} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${x1},${y1}`
+  
+  return `M ${x1},${y1} L ${x2},${y2} A ${radius} ${radius} 0 ${large} 1 ${x3},${y3} L ${x4},${y4} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${x1},${y1} Z`
 }
 
 function labelX(i) {
   const midAngle = (i * angle + angle / 2 - 90) * (Math.PI / 180)
-  return 250 + (radius - 20) * Math.cos(midAngle)
+  const textRadius = innerRadius + (radius - innerRadius) * 0.89
+  return 250 + textRadius * Math.cos(midAngle)
 }
 
 function labelY(i) {
   const midAngle = (i * angle + angle / 2 - 90) * (Math.PI / 180)
-  return 250 + (radius - 20) * Math.sin(midAngle)
+  const textRadius = innerRadius + (radius - innerRadius) * 0.89
+  return 250 + textRadius * Math.sin(midAngle)
 }
 
-function radialX(i) {
-  const midAngle = (i * angle + angle / 2 - 90) * (Math.PI / 180)
-  return 250 + (radius + 40) * Math.cos(midAngle)
-}
-
-function radialY(i) {
-  const midAngle = (i * angle + angle / 2 - 90) * (Math.PI / 180)
-  return 250 + (radius + 40) * Math.sin(midAngle)
+function labelRotation(i) {
+  const angleDeg = (i * angle + angle / 2 - 90)
+  return angleDeg + 90 
 }
 
 function sliceColor(s) {
-  if (s.type === 'minigame') return '#FFD966'
-  if (s.value === 1) return '#FFE4E1'
-  if (s.value === 2) return '#FFB6C1'
-  if (s.value === 5) return '#FFA07A'
-  if (s.value === 10) return '#FF6347'
-  return '#FFE4E1'
+  if (s.label === 'Crazy Time') return '#E60000' 
+  if (s.label === 'Pachinko') return '#EE82EE' 
+  if (s.label === 'Cash Hunt') return '#32CD32' 
+  if (s.label === 'Coin Flip') return '#1E90FF' 
+  
+  if (s.value === 1) return '#87CEEB' 
+  if (s.value === 2) return '#DAA520' 
+  if (s.value === 5) return '#FF69B4' 
+  if (s.value === 10) return '#8A2BE2' 
+  return '#ccc'
 }
 
 function spin() {
   if (spinning.value) return
   spinning.value = true
+  
   const idx = Math.floor(Math.random() * total)
+  // Center of the target slice (relative to start of array)
   const sliceCenter = idx * angle + angle / 2
-  const rotations = 5 + Math.random() * 2
-  const finalRotation = rotations * 360 + (270 - sliceCenter)
+  
+  // Add Random Jitter (Stop +/- 40% from center of slice)
+  // This makes it land randomly inside the slice, not always dead center
+  const jitter = (Math.random() - 0.5) * (angle * 0.8)
+  
+  // Calculate Target Rotation
+  // We want Visual Position = Target (270)
+  // Start(-90) + sliceCenter + Rotation + Jitter = 270
+  // Rotation = 360 - sliceCenter - Jitter
+  
+  const targetVisualAngle = (360 - sliceCenter + jitter + 360) % 360
+  
+  const currentMod = currentRotation.value % 360
+  
+  // Calculate forward distance
+  let distanceToTarget = targetVisualAngle - currentMod
+  while (distanceToTarget < 0) distanceToTarget += 360
+  
+  // Add minimum full spins (4 to 7)
+  const extraSpins = (4 + Math.floor(Math.random() * 4)) * 360
+  
+  const finalRotation = currentRotation.value + distanceToTarget + extraSpins
+  
   currentRotation.value = finalRotation
 }
 
@@ -109,14 +180,12 @@ function onTransitionEnd() {
   spinning.value = false
   const normalized = ((currentRotation.value % 360) + 360) % 360
   const pointerAngle = 270
-  const landedAngle = (pointerAngle - normalized + 360) % 360
+  // Offset +90deg (Fixes payout mismatch)
+  const landedAngle = (pointerAngle - normalized + 90 + 360) % 360
   const landedIndex = Math.floor(landedAngle / angle) % total
+  
   const result = slices[landedIndex]
-  if (result.type === 'minigame') {
-    router.push(`/minigame/${result.id}`)
-  } else {
-    alert(`🎉 Hai vinto: ${result.label}!`)
-  }
+  emit('result', result)
 }
 </script>
 
@@ -126,84 +195,71 @@ function onTransitionEnd() {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  animation: slideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px) }
-  to { opacity: 1; transform: translateY(0) }
+  justify-content: center;
+  padding: 10px;
 }
 
 .wheel-frame {
   position: relative;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.5), transparent);
+  width: 80vmin; 
+  height: 80vmin;
+  max-width: 700px;
+  max-height: 700px;
+  
+  background: radial-gradient(circle, #333 30%, #000 100%);
   border-radius: 50%;
-  border: 8px solid #FFD966;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 40px rgba(0,0,0,0.2), 0 0 30px rgba(255,217,102,0.4);
+  padding: 15px; 
+  border: 4px solid #F0C420; 
+  box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.wheel-frame::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+
 .pointer {
   position: absolute;
-  top: -28px;
-  font-size: 48px;
-  font-weight: bold;
-  color: #FFD966;
-  text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  top: -5%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 5vh;
+  color: #FFD700;
   z-index: 10;
-  filter: drop-shadow(0 0 8px rgba(255,217,102,0.6));
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
 }
 
 .wheel-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
 }
 
 .slice-text {
-  font-size: 24px;
-  font-weight: 900;
+  font-size: 10.5px;
+  font-weight: 800;
   text-anchor: middle;
   dominant-baseline: middle;
-  fill: white;
-  stroke: #000;
-  stroke-width: 2px;
+  fill: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .minigame-text {
-  fill: white;
-  stroke: #b22222;
-  stroke-width: 2.5px;
-  font-size: 26px;
+  font-size: 10px;
+  fill: #FFF;
   font-weight: 900;
+  letter-spacing: 0px; 
 }
 
-.btn-spin {
-  background: linear-gradient(135deg, #FFD966, #FFC107);
-  color: #b22222;
-  padding: 16px 40px;
-  font-size: 1.3rem;
-  font-weight: 900;
-  border: 3px solid #b22222;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 12px 30px rgba(255,217,102,0.4);
-  transition: all 0.3s ease;
-  letter-spacing: 1px;
-}
-
-.btn-spin:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(255,217,102,0.6);
-  background: linear-gradient(135deg, #FFE082, #FFD966);
-}
-
-.btn-spin:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.slice-path:hover {
+  filter: brightness(1.2); 
 }
 </style>
