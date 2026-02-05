@@ -1,0 +1,192 @@
+/* Full screen dark warm gradient background */
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #8b0000, #b22222); /* rosso scuro elegante */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Card */
+.login-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  width: 360px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Title */
+.login-card h1 {
+  margin-bottom: 10px;
+  font-size: 28px;
+  color: #4d0000; /* rosso scuro più leggibile */
+}
+
+/* Subtitle */
+.login-card p {
+  margin-bottom: 25px;
+  color: #660000; /* rosso scuro equilibrato */
+}
+
+/* Buttons container */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Buttons style */
+button {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white; /* testo sempre bianco per contrasto */
+}
+
+/* Login button */
+.login-btn {
+  background-color: #e74c3c; /* rosso vivo */
+}
+
+.login-btn:hover {
+  background-color: #c0392b; /* rosso più scuro */
+  transform: scale(1.03);
+}
+
+/* Register button */
+.register-btn {
+  background-color: #d35400; /* arancione-rosso caldo */
+}
+
+.register-btn:hover {
+  background-color: #b03a00; /* più scuro */
+  transform: scale(1.03);
+}
+
+/* Full-screen overlay modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-overlay .modal {
+  background: #ffffff; /* plain white background for the form */
+  width: 90%;
+  max-width: 520px;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #4d0000;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-body {
+  padding: 18px 22px;
+  flex: 1 1 auto;
+  display: block;
+}
+
+.modal-body form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #440000;
+  font-weight: 600;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fffaf8;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 14px 18px 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
+}
+
+.btn-cancel {
+  background-color: rgba(255,255,255,0.9);
+  color: #4d0000;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.btn-submit {
+  background: linear-gradient(90deg, #b22222, #8b0000);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(139,0,0,0.25);
+}
+
+/* Make the overlay form truly cover mobile screens nicely */
+@media (max-width: 600px) {
+  .modal-overlay .modal {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+  .modal-body {
+    padding: 16px;
+  }
+}

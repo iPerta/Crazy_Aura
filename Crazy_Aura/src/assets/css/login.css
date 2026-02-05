@@ -1,0 +1,136 @@
+/* Full screen dark warm gradient background */
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #8b0000, #b22222); /* rosso scuro elegante */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Card */
+.login-card {
+  background: #fffdf9; /* very light cream for clear contrast */
+  padding: 36px 28px;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+  text-align: center;
+  width: 360px;
+  transition: transform 0.26s ease, box-shadow 0.26s ease;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.login-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Title */
+.login-card h1 {
+  margin-bottom: 10px;
+  font-size: 28px;
+  color: #4d0000; /* rosso scuro più leggibile */
+}
+
+/* Subtitle */
+.login-card p {
+  margin-bottom: 25px;
+  color: #660000; /* rosso scuro equilibrato */
+}
+
+/* Buttons container */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Buttons style */
+button {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white; /* testo sempre bianco per contrasto */
+}
+
+/* Login button */
+.login-btn {
+  background-color: #e74c3c; /* rosso vivo */
+}
+
+.login-btn:hover {
+  background-color: #c0392b; /* rosso più scuro */
+  transform: scale(1.03);
+}
+
+/* Register button */
+.register-btn {
+  background-color: #d35400; /* arancione-rosso caldo */
+}
+
+.register-btn:hover {
+  background-color: #b03a00; /* più scuro */
+  transform: scale(1.03);
+}
+
+/* Modal / overlay styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 2200;
+}
+
+.modal-overlay .modal {
+  background: #ffffff; /* light modal surface */
+  width: 92%;
+  max-width: 520px;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  background: linear-gradient(90deg, #fffdf9, #fffaf6);
+}
+
+.modal-header h2 { color: #4d0000; margin: 0; font-size: 1.25rem }
+
+.close-btn { background:none; border:none; font-size:1.4rem; cursor:pointer }
+
+.modal-body { padding: 18px }
+
+.modal-body form { width: 100% }
+
+.form-group { margin-bottom: 14px }
+
+.form-group label { display:block; margin-bottom:6px; color:#440000; font-weight:600 }
+
+.form-group input {
+  width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(0,0,0,0.08);
+  background: #fff; font-size:1rem;
+}
+
+.modal-footer { display:flex; justify-content:flex-end; gap:10px; padding:12px 16px }
+
+.btn-cancel { background: rgba(255,255,255,0.95); color:#4d0000; padding:10px 14px; border-radius:8px }
+
+.btn-submit { background: linear-gradient(90deg,#b22222,#8b0000); color:#fff; padding:10px 16px; border-radius:8px }
+
+@media (max-width:600px){
+  .modal-overlay .modal{ width:100%; height:100%; border-radius:0 }
+}
