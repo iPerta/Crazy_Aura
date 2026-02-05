@@ -45,7 +45,7 @@
           <!-- Central Hub (Logo) -->
           <circle cx="250" cy="250" :r="innerRadius" fill="url(#grad-red)" stroke="url(#grad-gold)" stroke-width="8" />
           <text x="250" y="240" text-anchor="middle" fill="#FFD700" font-family="serif" font-weight="900" font-size="24" filter="drop-shadow(2px 2px 2px black)">CRAZY</text>
-          <text x="250" y="270" text-anchor="middle" fill="#FFF" font-family="serif" font-weight="900" font-size="24" filter="drop-shadow(2px 2px 2px black)" letter-spacing="2">WHEEL</text>
+          <text x="250" y="270" text-anchor="middle" fill="#FFF" font-family="serif" font-weight="900" font-size="24" filter="drop-shadow(2px 2px 2px black)" letter-spacing="2">AURA</text>
         </g>
       </svg>
     </div>
