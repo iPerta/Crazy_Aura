@@ -2,69 +2,50 @@
   <div class="betting-grid">
     <div class="bet-options">
       <!-- Number Bets -->
-      <div class="bet-card num-1" @click="$emit('place-bet', '1')">
+      <div
+        v-for="num in ['1', '2', '5', '10']"
+        :key="num"
+        :class="[
+          'bet-card',
+          'num-' + num,
+          { 'has-multiplier': topSlotMatch?.target.label === num },
+        ]"
+        @click="$emit('place-bet', num)"
+      >
         <div class="bet-content">
-          <span class="bet-label">1</span>
-          <span class="bet-payout">Pays 1x</span>
+          <span class="bet-label">{{ num }}</span>
+          <span class="bet-payout">Pays {{ num }}x</span>
         </div>
-        <div v-if="bets['1']" class="chip">{{ bets['1'] }}</div>
-      </div>
-      
-      <div class="bet-card num-2" @click="$emit('place-bet', '2')">
-        <div class="bet-content">
-          <span class="bet-label">2</span>
-          <span class="bet-payout">Pays 2x</span>
+        <div v-if="bets[num]" class="chip">{{ formatAmount(bets[num]) }}</div>
+        <div v-if="topSlotMatch?.target.label === num" class="multiplier-badge">
+          {{ topSlotMatch.multiplier }}X
         </div>
-        <div v-if="bets['2']" class="chip">{{ bets['2'] }}</div>
-      </div>
-      
-      <div class="bet-card num-5" @click="$emit('place-bet', '5')">
-        <div class="bet-content">
-          <span class="bet-label">5</span>
-          <span class="bet-payout">Pays 5x</span>
-        </div>
-        <div v-if="bets['5']" class="chip">{{ bets['5'] }}</div>
-      </div>
-      
-      <div class="bet-card num-10" @click="$emit('place-bet', '10')">
-        <div class="bet-content">
-          <span class="bet-label">10</span>
-          <span class="bet-payout">Pays 10x</span>
-        </div>
-        <div v-if="bets['10']" class="chip">{{ bets['10'] }}</div>
       </div>
 
       <!-- Bonus Bets -->
-      <div class="bet-card bonus-cf" @click="$emit('place-bet', 'Coin Flip')">
+      <div
+        v-for="bonus in [
+          { label: 'Coin Flip', class: 'bonus-cf' },
+          { label: 'Pachinko', class: 'bonus-ph' },
+          { label: 'Cash Hunt', class: 'bonus-ch' },
+          { label: 'Crazy Time', class: 'bonus-ct' },
+        ]"
+        :key="bonus.label"
+        :class="[
+          'bet-card',
+          bonus.class,
+          { 'has-multiplier': topSlotMatch?.target.label === bonus.label },
+        ]"
+        @click="$emit('place-bet', bonus.label)"
+      >
         <div class="bet-content">
-          <span class="bet-label">Coin Flip</span>
+          <span class="bet-label">{{ bonus.label }}</span>
           <span class="bet-payout">Bonus</span>
         </div>
-        <div v-if="bets['Coin Flip']" class="chip">{{ bets['Coin Flip'] }}</div>
-      </div>
-      
-      <div class="bet-card bonus-ph" @click="$emit('place-bet', 'Pachinko')">
-        <div class="bet-content">
-          <span class="bet-label">Pachinko</span>
-          <span class="bet-payout">Bonus</span>
+        <div v-if="bets[bonus.label]" class="chip">{{ formatAmount(bets[bonus.label]) }}</div>
+        <div v-if="topSlotMatch?.target.label === bonus.label" class="multiplier-badge">
+          {{ topSlotMatch.multiplier }}X
         </div>
-        <div v-if="bets['Pachinko']" class="chip">{{ bets['Pachinko'] }}</div>
-      </div>
-      
-      <div class="bet-card bonus-ch" @click="$emit('place-bet', 'Cash Hunt')">
-        <div class="bet-content">
-          <span class="bet-label">Cash Hunt</span>
-          <span class="bet-payout">Bonus</span>
-        </div>
-        <div v-if="bets['Cash Hunt']" class="chip">{{ bets['Cash Hunt'] }}</div>
-      </div>
-      
-      <div class="bet-card bonus-ct" @click="$emit('place-bet', 'Crazy Time')">
-        <div class="bet-content">
-          <span class="bet-label">Crazy Time</span>
-          <span class="bet-payout">Bonus</span>
-        </div>
-        <div v-if="bets['Crazy Time']" class="chip">{{ bets['Crazy Time'] }}</div>
       </div>
     </div>
   </div>
@@ -74,11 +55,22 @@
 defineProps({
   bets: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
+  topSlotMatch: {
+    type: Object,
+    default: null,
+  },
 })
 
 defineEmits(['place-bet'])
+
+function formatAmount(val) {
+  if (!val) return '0'
+  if (val < 1) return val.toFixed(2)
+  if (Number.isInteger(val)) return val.toString()
+  return val.toFixed(2)
+}
 </script>
 
 <style scoped>
@@ -104,7 +96,7 @@ defineEmits(['place-bet'])
   align-items: center;
   justify-content: center;
   transition: transform 0.1s;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   user-select: none;
 }
 
@@ -120,43 +112,114 @@ defineEmits(['place-bet'])
 
 .bet-label {
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: white;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  text-align: center;
 }
 
 .bet-payout {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.8);
-  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 1);
+  margin-top: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 /* Specific Styles for Cards */
-.num-1 { background: radial-gradient(#82CAFA, #4682B4); }
-.num-2 { background: radial-gradient(#DAA520, #B8860B); }
-.num-5 { background: radial-gradient(#FF69B4, #DB7093); }
-.num-10 { background: radial-gradient(#9370DB, #8A2BE2); }
+.num-1 {
+  background: radial-gradient(#82cafa, #4682b4);
+}
+.num-2 {
+  background: radial-gradient(#daa520, #b8860b);
+}
+.num-5 {
+  background: radial-gradient(#ff69b4, #db7093);
+}
+.num-10 {
+  background: radial-gradient(#9370db, #8a2be2);
+}
 
-.bonus-cf { background: radial-gradient(#4169E1, #00008B); border: 2px solid #FFD700; }
-.bonus-ph { background: radial-gradient(#DA70D6, #800080); border: 2px solid #FFD700; } /* Magenta/Purple */
-.bonus-ch { background: radial-gradient(#3CB371, #006400); border: 2px solid #FFD700; } /* Green */
-.bonus-ct { background: radial-gradient(#DC143C, #8B0000); border: 2px solid #FFD700; } /* Red */
+.bonus-cf {
+  background: radial-gradient(#4169e1, #00008b);
+  border: 2px solid #ffd700;
+}
+.bonus-ph {
+  background: radial-gradient(#da70d6, #800080);
+  border: 2px solid #ffd700;
+} /* Magenta/Purple */
+.bonus-ch {
+  background: radial-gradient(#3cb371, #006400);
+  border: 2px solid #ffd700;
+} /* Green */
+.bonus-ct {
+  background: radial-gradient(#dc143c, #8b0000);
+  border: 2px solid #ffd700;
+} /* Red */
 
 .chip {
   position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 30px;
-  height: 30px;
+  top: -12px;
+  right: -5px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
   background: white;
-  border: 5px solid #333;
-  border-radius: 50%;
+  border: 3px solid #333;
+  border-radius: 16px;
   color: #333;
-  font-weight: bold;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  font-size: 0.85rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.multiplier-badge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, #ffd700, #ffa500);
+  color: #000;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 0.9rem;
+  box-shadow: 0 0 10px #ffd700;
+  border: 1px solid #fff;
+  z-index: 10;
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.has-multiplier {
+  animation: border-pulse 1s infinite alternate;
+  border: 3px solid #ffd700 !important;
+}
+
+@keyframes pop-in {
+  from {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes border-pulse {
+  from {
+    box-shadow: 0 0 5px #ffd700;
+  }
+  to {
+    box-shadow: 0 0 20px #ffd700;
+  }
 }
 </style>
