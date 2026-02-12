@@ -5,6 +5,7 @@ import Wheel from '@/components/Wheel.vue'
 import BettingGrid from '@/components/BettingGrid.vue'
 import TopSlot from '@/components/TopSlot.vue'
 import ChipSelector from '@/components/ChipSelector.vue'
+import ResultHistory from '@/components/ResultHistory.vue'
 
 const router = useRouter()
 const showSettings = ref(false)
@@ -23,6 +24,7 @@ const spinning = ref(false)
 const topSlotSpinning = ref(false)
 const activeTopSlot = ref(null) // { target: {label, type}, multiplier: 10 }
 const selectedChip = ref(10) // Default chip value
+const history = ref([]) // Last 10 results
 
 // Win State
 const winAmount = ref(0)
@@ -63,6 +65,12 @@ onMounted(() => {
     balance.value = parseFloat(storedBalance)
   } else {
     localStorage.setItem('balance', balance.value)
+  }
+
+  // Load history from storage
+  const storedHistory = localStorage.getItem('gameHistory')
+  if (storedHistory) {
+    history.value = JSON.parse(storedHistory)
   }
 
   // Start the Game Loop
@@ -189,6 +197,13 @@ const handleResult = (result) => {
     }
   }
 
+  // UPDATE HISTORY
+  history.value.unshift(result)
+  if (history.value.length > 10) {
+    history.value.pop()
+  }
+  localStorage.setItem('gameHistory', JSON.stringify(history.value))
+
   // Reset for next round
   setTimeout(() => {
     showWin.value = false
@@ -282,7 +297,7 @@ const saveSettings = () => {
     </div>
 
     <div class="game-content">
-      <!-- Big Center Timer -->
+      <!-- Big Center Timer (Now positioned relative to content) -->
       <div v-if="!spinning && !topSlotSpinning && timeLeft > 0" class="timer-overlay">
         <div class="timer-text">{{ timeLeft }}</div>
         <div class="timer-label">PLACE YOUR BETS</div>
@@ -300,29 +315,35 @@ const saveSettings = () => {
         {{ gameStatus }}
       </div>
 
-      <!-- Top Slot Area -->
-      <TopSlot ref="topSlotRef" @spin-end="handleTopSlotResult" />
+      <div class="main-play-area">
+        <!-- Left Column: Top Slot, Wheel, History -->
+        <div class="left-section">
+          <TopSlot ref="topSlotRef" @spin-end="handleTopSlotResult" />
+          <div class="wheel-area">
+            <Wheel ref="wheelRef" @result="handleResult" />
+          </div>
+        </div>
 
-      <div class="wheel-area">
-        <Wheel ref="wheelRef" @result="handleResult" />
-      </div>
-
-      <!-- Betting Grid Controls -->
-      <div class="betting-area">
-        <ChipSelector :modelValue="selectedChip" @select-chip="selectedChip = $event" />
-        <BettingGrid
-          :bets="bets"
-          :topSlotMatch="activeTopSlot && activeTopSlot.isMatch ? activeTopSlot : null"
-          @place-bet="placeBet"
-        />
-        <div class="action-buttons">
-          <button
-            class="btn-clear"
-            @click="clearBets"
-            :disabled="spinning || topSlotSpinning || totalBet === 0 || timeLeft <= 0"
-          >
-            Clear Bets
-          </button>
+        <!-- Right Column: Betting Area -->
+        <div class="right-section">
+          <div class="betting-area">
+            <ResultHistory :history="history" />
+            <ChipSelector :modelValue="selectedChip" @select-chip="selectedChip = $event" />
+            <BettingGrid
+              :bets="bets"
+              :topSlotMatch="activeTopSlot && activeTopSlot.isMatch ? activeTopSlot : null"
+              @place-bet="placeBet"
+            />
+            <div class="action-buttons">
+              <button
+                class="btn-clear"
+                @click="clearBets"
+                :disabled="spinning || topSlotSpinning || totalBet === 0 || timeLeft <= 0"
+              >
+                Clear Bets
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -386,7 +407,7 @@ const saveSettings = () => {
   flex-direction: column;
   min-height: 100vh;
   background: linear-gradient(135deg, #1a0a0a 0%, #4a0000 50%, #1a0a0a 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
   position: relative;
 }
@@ -478,11 +499,36 @@ const saveSettings = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 1rem;
-  padding-top: 80px;
-  padding-bottom: 50px;
+  justify-content: center;
+  padding: 1rem 2rem;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-play-area {
+  display: flex;
+  width: 100%;
+  max-width: 1600px;
+  justify-content: space-around;
+  align-items: center;
+  gap: 2rem;
+}
+
+.left-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.right-section {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .timer-overlay {

@@ -25,7 +25,7 @@ const props = defineProps({
 
 defineEmits(['select-chip'])
 
-const chipValues = [0.1, 0.25, 0.5, 1, 5, 10, 25, 50, 100]
+const chipValues = [0.1, 0.25, 0.5, 1, 5, 10, 25, 50, 100, 250, 500, 1000]
 
 function formatValue(val) {
   if (val < 1) return val.toFixed(2)
@@ -42,6 +42,9 @@ function getChipClass(val) {
   if (val === 25) return 'chip-25'
   if (val === 50) return 'chip-50'
   if (val === 100) return 'chip-100'
+  if (val === 250) return 'chip-250'
+  if (val === 500) return 'chip-500'
+  if (val === 1000) return 'chip-1000'
   return ''
 }
 </script>
@@ -146,6 +149,33 @@ function getChipClass(val) {
 .chip-100 {
   background: radial-gradient(#333333, #000000);
   border: 2px solid #ffd700;
+}
+.chip-250 {
+  background: radial-gradient(#ffd700, #b8860b);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+.chip-250 .chip-value {
+  color: #000;
+  text-shadow: none;
+}
+.chip-500 {
+  background: radial-gradient(#e5e4e2, #a9a9a9); /* Platinum */
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(229, 228, 226, 0.6);
+}
+.chip-500 .chip-value {
+  color: #000;
+  text-shadow: none;
+}
+.chip-1000 {
+  background: radial-gradient(#4a4a4a, #000000); /* Dark Obsidian/Diamond */
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+.chip-1000 .chip-value {
+  color: #00ffff;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
 }
 
 .active::after {
