@@ -115,11 +115,6 @@ const placeBet = (type) => {
   }
 }
 
-const clearBets = () => {
-  if (spinning.value || topSlotSpinning.value || timeLeft.value <= 0) return
-  betTypes.forEach((type) => (bets[type] = 0))
-}
-
 const lockAndSpin = () => {
   // Deduct bets now
   if (totalBet.value > 0) {
@@ -316,9 +311,8 @@ const saveSettings = () => {
       </div>
 
       <div class="main-play-area">
-        <!-- Left Column: Top Slot, Wheel, History -->
+        <!-- Left Column: Wheel -->
         <div class="left-section">
-          <TopSlot ref="topSlotRef" @spin-end="handleTopSlotResult" />
           <div class="wheel-area">
             <Wheel ref="wheelRef" @result="handleResult" />
           </div>
@@ -327,6 +321,7 @@ const saveSettings = () => {
         <!-- Right Column: Betting Area -->
         <div class="right-section">
           <div class="betting-area">
+            <TopSlot ref="topSlotRef" @spin-end="handleTopSlotResult" />
             <ResultHistory :history="history" />
             <ChipSelector :modelValue="selectedChip" @select-chip="selectedChip = $event" />
             <BettingGrid
@@ -334,15 +329,6 @@ const saveSettings = () => {
               :topSlotMatch="activeTopSlot && activeTopSlot.isMatch ? activeTopSlot : null"
               @place-bet="placeBet"
             />
-            <div class="action-buttons">
-              <button
-                class="btn-clear"
-                @click="clearBets"
-                :disabled="spinning || topSlotSpinning || totalBet === 0 || timeLeft <= 0"
-              >
-                Clear Bets
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -652,33 +638,6 @@ const saveSettings = () => {
   flex-direction: column;
   gap: 10px;
   align-items: center;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 20px;
-  width: 100%;
-  justify-content: center;
-  margin-top: 20px;
-}
-.btn-clear {
-  background: #ff4757;
-  color: white;
-  padding: 10px 40px;
-  border-radius: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  font-size: 1.2rem;
-  transition: all 0.3s;
-}
-.btn-clear:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
-}
-.btn-clear:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 /* Modal Styles Reuse */
